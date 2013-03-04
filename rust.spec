@@ -29,6 +29,7 @@ BuildRequires:  curl
 
 
 %filter_from_requires /x86_64-unknown-linux-gnu/d
+%filter_requires_in -P bin/(rust|cargo).*
 %filter_setup
 
 %description
