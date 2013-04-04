@@ -3,10 +3,11 @@
 # This is planned to change in future, when the llvm patches are upstreamed
 #
 # Issues
-# - [ ] Custom LLVM
-# - [ ] Hardcoded libdir
-# - [ ] 0.6 is unreleased
-# - [ ] x86_64 only (not handled)
+# - Custom LLVM - use --llvm-root=?
+# - Hardcoded libdir
+# - libuv is included
+#
+# Wiki page: https://github.com/mozilla/rust/wiki/Note-packaging
 #
 
 Name:           rust
@@ -27,6 +28,8 @@ BuildRequires:  perl
 BuildRequires:  curl
 #BuildRequires:  pandoc
 
+# LLVM features are only present in x86_64
+BuildArch:      x86_64
 
 %filter_from_requires /x86_64-unknown-linux-gnu/d
 %filter_requires_in -P bin/(rust|cargo).*
