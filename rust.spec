@@ -43,7 +43,7 @@ documentation.
 %prep
 %setup -q
 
-# Prevent cusotm configure from failing
+# Prevent custom configure from failing
 sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not recognized and ignored./" configure
 
 # Remove rpaths
