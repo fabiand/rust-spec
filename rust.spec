@@ -12,7 +12,7 @@
 
 Name:           rust
 Version:        0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
@@ -27,6 +27,7 @@ BuildRequires:  python
 BuildRequires:  perl
 BuildRequires:  curl
 #BuildRequires:  pandoc
+BuildRequires:  chrpath
 
 # LLVM features are only present in x86_64
 BuildArch:      x86_64
@@ -45,9 +46,6 @@ documentation.
 
 # Prevent custom configure from failing
 sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not recognized and ignored./" configure
-
-# Remove rpaths
-sed -i "/get_rpath_flags/d" src/librustc/back/link.rs
 
 
 %build
@@ -68,8 +66,11 @@ make install DESTDIR=%{buildroot}
 mkdir -p %{buildroot}/%{_sysconfdir}/ld.so.conf.d
 cat <<EOF >/%{buildroot}/%{_sysconfdir}/ld.so.conf.d/rust-%{_arch}.conf
 %{_prefix}/lib/rustc/
+%{_prefix}/lib/rustc/x86_64-unknown-linux-gnu/lib/
 EOF
 
+# Remove rpaths
+{ find %{buildroot}/usr/bin -type f ; find %{buildroot} -type f -name \*.so ; } | xargs chrpath --delete
 
 %post -p /sbin/ldconfig
 
@@ -84,10 +85,13 @@ EOF
 %{_prefix}/lib/libsyntax*
 %{_prefix}/lib/rustc/*
 %{_datadir}/man/*
-%{_bindir}/cargo*
-%{_prefix}/lib/libcargo*
 
 
 %changelog
-* Fri Mar 01 2013 Fabian Deutsch <fabian.deutsch@gmx.de> - 0.6-1
+* Fri Apr 19 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.6-2
+- Update to rust-0.6
+- Remove cargo
+- Fix rpath issues differently (chrpath)
+
+* Fri Mar 01 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.6-1
 - Initial package
