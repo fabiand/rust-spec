@@ -11,8 +11,8 @@
 #
 
 Name:           rust
-Version:        0.6
-Release:        2%{?dist}
+Version:        0.7
+Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
@@ -81,13 +81,17 @@ EOF
 %{_bindir}/rust*
 %{_prefix}/lib/librust*
 %{_prefix}/lib/libstd*
-%{_prefix}/lib/libcore*
+%{_prefix}/lib/libextra*
 %{_prefix}/lib/libsyntax*
 %{_prefix}/lib/rustc/*
 %{_datadir}/man/*
 
 
 %changelog
+* Thu Jul 04 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.7-1
+- Update to 0.7
+- Introduce libextra
+
 * Fri Apr 19 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.6-2
 - Update to rust-0.6
 - Remove cargo
