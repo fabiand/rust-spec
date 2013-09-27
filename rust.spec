@@ -11,7 +11,7 @@
 #
 
 Name:           rust
-Version:        0.7
+Version:        0.8
 Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
@@ -88,6 +88,9 @@ EOF
 
 
 %changelog
+* Fri Sep 27 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-1
+- Update to 0.8
+
 * Thu Jul 04 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.7-1
 - Update to 0.7
 - Introduce libextra
