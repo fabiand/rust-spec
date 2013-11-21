@@ -12,7 +12,7 @@
 
 Name:           rust
 Version:        0.8
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
@@ -88,6 +88,9 @@ EOF
 
 
 %changelog
+* Tue Oct 01 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-2
+- Rebuild for copr
+
 * Fri Sep 27 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-1
 - Update to 0.8
 
