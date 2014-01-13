@@ -11,8 +11,8 @@
 #
 
 Name:           rust
-Version:        0.8
-Release:        2%{?dist}
+Version:        0.9
+Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
@@ -49,7 +49,8 @@ sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not rec
 
 
 %build
-%configure
+%define _triple_override x86_64-unknown-linux-gnu
+%configure --build=%{_triple_override} --host=%{_triple_override} --target=%{_triple_override}
 
 # LD_LIBRARY_PATH is passed to tell the linker were to find the different libraries,
 # this is needed because the rpaths were removed in prep
@@ -77,17 +78,24 @@ EOF
 
 %files
 %doc COPYRIGHT LICENSE-APACHE LICENSE-MIT README.md
-%{_sysconfdir}/ld.so.conf.d/rust-%{_arch}.conf
+%{_sysconfdir}/ld.so.conf.d/rust-*.conf
 %{_bindir}/rust*
-%{_prefix}/lib/librust*
-%{_prefix}/lib/libstd*
-%{_prefix}/lib/libextra*
-%{_prefix}/lib/libsyntax*
-%{_prefix}/lib/rustc/*
+%{_libdir}/libstd*
+%{_libdir}/libextra*
+%{_libdir}/librustuv*
+%{_libdir}/libgreen*
+%{_libdir}/librustc*
+%{_libdir}/libsyntax*
+%{_libdir}/librustpkg*
+%{_libdir}/librustdoc*
+%{_libdir}/rustlib/*
 %{_datadir}/man/*
 
 
 %changelog
+* Mon Jan 13 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.9-1
+- Update to 0.9
+
 * Tue Oct 01 2013 Fabian Deutsch <fabiand@fedoraproject.org> - 0.8-2
 - Rebuild for copr
 
