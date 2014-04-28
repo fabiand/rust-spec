@@ -19,6 +19,7 @@ License:        ASL 2.0, MIT
 URL:            http://www.rust-lang.org
 Source0:        http://static.rust-lang.org/dist/%{name}-%{version}.tar.gz
 
+BuildRequires:  make
 BuildRequires:  llvm-devel
 BuildRequires:  clang-devel
 BuildRequires:  gcc
@@ -74,7 +75,10 @@ EOF
 { find %{buildroot}/usr/bin -type f ; find %{buildroot} -type f -name \*.so ; } | xargs chrpath --delete
 
 # Remove buildroot from manifest
-sed -i "s#^%{buildroot}##" %{buildroot}/%{_libdir}/manifest
+sed -i "s#^%{buildroot}##" %{buildroot}/%{_libdir}/rustlib/manifest
+
+%check
+make check
 
 
 %post -p /sbin/ldconfig
@@ -84,14 +88,7 @@ sed -i "s#^%{buildroot}##" %{buildroot}/%{_libdir}/manifest
 %doc COPYRIGHT LICENSE-APACHE LICENSE-MIT README.md
 %{_sysconfdir}/ld.so.conf.d/rust-*.conf
 %{_bindir}/rust*
-%{_libdir}/libstd*
-%{_libdir}/libextra*
-%{_libdir}/librustuv*
-%{_libdir}/libgreen*
-%{_libdir}/librustc*
-%{_libdir}/libsyntax*
-%{_libdir}/librustpkg*
-%{_libdir}/librustdoc*
+%{_libdir}/lib*
 %{_libdir}/rustlib/*
 %{_datadir}/man/*
 
