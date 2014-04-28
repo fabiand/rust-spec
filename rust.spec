@@ -11,7 +11,7 @@
 #
 
 Name:           rust
-Version:        0.9
+Version:        0.10
 Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
@@ -73,6 +73,10 @@ EOF
 # Remove rpaths
 { find %{buildroot}/usr/bin -type f ; find %{buildroot} -type f -name \*.so ; } | xargs chrpath --delete
 
+# Remove buildroot from manifest
+sed -i "s#^%{buildroot}##" %{buildroot}/%{_libdir}/manifest
+
+
 %post -p /sbin/ldconfig
 
 
@@ -93,6 +97,9 @@ EOF
 
 
 %changelog
+* Fri Apr 25 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.10-1
+- Update to 0.10
+
 * Mon Jan 13 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.9-1
 - Update to 0.9
 
