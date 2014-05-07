@@ -18,6 +18,8 @@ Summary:        The Rust Programming Language
 License:        ASL 2.0, MIT
 URL:            http://www.rust-lang.org
 Source0:        http://static.rust-lang.org/dist/%{name}-%{version}.tar.gz
+Source1:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-x86_64-a7b2af1076d48e4a687a71a21478293e834349bd.tar.bz2 
+Source2:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-i386-3bef5684fd0582fbd4ddebd4514182d4f72924f7.tar.bz2 
 
 BuildRequires:  make
 BuildRequires:  llvm-devel
@@ -44,6 +46,8 @@ documentation.
 
 %prep
 %setup -q
+mkdir -p dl/
+cp %{SOURCE1} %{SOURCE2} dl/
 
 # Prevent custom configure from failing
 sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not recognized and ignored./" configure
@@ -98,6 +102,7 @@ make check
 - Use ExclusiveArch to limit supported architectures instead of forcing
   it with BuildArch
 - Enable i686
+- Add bootstrap sources, so that build won't access Internet
 
 * Fri Apr 25 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.10-1
 - Update to 0.10
