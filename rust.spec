@@ -35,6 +35,7 @@ BuildRequires:  perl
 BuildRequires:  curl
 #BuildRequires:  pandoc
 BuildRequires:  chrpath
+BuildRequires:  git
 %if %without bootstrap
 BuildRequires:  rust
 %endif
@@ -118,6 +119,7 @@ make check
 - Enable i686
 - Add bootstrap sources, so that build won't access Internet
 - Make it possible to build without bootstrapoing with bundled LLVM
+- BuildRequire git
 
 * Fri Apr 25 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.10-1
 - Update to 0.10
