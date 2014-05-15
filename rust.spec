@@ -10,14 +10,20 @@
 # Wiki page: https://github.com/mozilla/rust/wiki/Note-packaging
 #
 
+%bcond_without bootstrap
+
 Name:           rust
 Version:        0.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
 URL:            http://www.rust-lang.org
 Source0:        http://static.rust-lang.org/dist/%{name}-%{version}.tar.gz
+%if %with bootstrap
+Source1:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-x86_64-a7b2af1076d48e4a687a71a21478293e834349bd.tar.bz2 
+Source2:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-i386-3bef5684fd0582fbd4ddebd4514182d4f72924f7.tar.bz2 
+%endif
 
 BuildRequires:  make
 BuildRequires:  llvm-devel
@@ -29,11 +35,15 @@ BuildRequires:  perl
 BuildRequires:  curl
 #BuildRequires:  pandoc
 BuildRequires:  chrpath
+BuildRequires:  git
+%if %without bootstrap
+BuildRequires:  rust
+%endif
 
-# LLVM features are only present in x86_64
-BuildArch:      x86_64
+# LLVM features are only present in x86
+ExclusiveArch:      x86_64 i686
 
-%filter_from_requires /x86_64-unknown-linux-gnu/d
+%filter_from_requires /%{_target_cpu}-unknown-linux-gnu/d
 %filter_requires_in -P bin/(rust|cargo).*
 %filter_setup
 
@@ -44,19 +54,28 @@ documentation.
 
 %prep
 %setup -q
+%if %with bootstrap
+mkdir -p dl/
+cp %{SOURCE1} %{SOURCE2} dl/
+%endif
 
 # Prevent custom configure from failing
 sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not recognized and ignored./" configure
 
 
 %build
-%define _triple_override x86_64-unknown-linux-gnu
-%configure --build=%{_triple_override} --host=%{_triple_override} --target=%{_triple_override}
+%define _triple_override %{_target_cpu}-unknown-linux-gnu
+%configure --build=%{_triple_override} --host=%{_triple_override} --target=%{_triple_override} \
+%if %with bootstrap
+# nothing
+%else
+--enable-local-rust
+%endif
 
 # LD_LIBRARY_PATH is passed to tell the linker were to find the different libraries,
 # this is needed because the rpaths were removed in prep
 make %{?_smp_mflags} \
-	LD_LIBRARY_PATH=x86_64-unknown-linux-gnu/stage0/lib/:x86_64-unknown-linux-gnu/stage1/lib/:x86_64-unknown-linux-gnu/stage2/lib/:x86_64-unknown-linux-gnu/stage3/lib/ 
+	LD_LIBRARY_PATH=%{_target_cpu}-unknown-linux-gnu/stage0/lib/:%{_target_cpu}-unknown-linux-gnu/stage1/lib/:%{_target_cpu}-unknown-linux-gnu/stage2/lib/:%{_target_cpu}-unknown-linux-gnu/stage3/lib/ 
 
 
 %install
@@ -66,9 +85,9 @@ make install DESTDIR=%{buildroot}
 
 # Create ld.so.conf file
 mkdir -p %{buildroot}/%{_sysconfdir}/ld.so.conf.d
-cat <<EOF >/%{buildroot}/%{_sysconfdir}/ld.so.conf.d/rust-%{_arch}.conf
+cat <<EOF >/%{buildroot}/%{_sysconfdir}/ld.so.conf.d/rust-%{_target_cpu}.conf
 %{_prefix}/lib/rustc/
-%{_prefix}/lib/rustc/x86_64-unknown-linux-gnu/lib/
+%{_prefix}/lib/rustc/%{_target_cpu}-unknown-linux-gnu/lib/
 EOF
 
 # Remove rpaths
@@ -94,6 +113,14 @@ make check
 
 
 %changelog
+* Wed May 07 2014 Lubomir Rintel <lkundrak@v3.sk> - 0.10-2
+- Use ExclusiveArch to limit supported architectures instead of forcing
+  it with BuildArch
+- Enable i686
+- Add bootstrap sources, so that build won't access Internet
+- Make it possible to build without bootstrapoing with bundled LLVM
+- BuildRequire git
+
 * Fri Apr 25 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.10-1
 - Update to 0.10
 
