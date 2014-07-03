@@ -14,8 +14,8 @@
 %bcond_with nightly
 
 Name:           rust
-Version:        0.10
-Release:        2%{?dist}
+Version:        0.11
+Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
@@ -122,6 +122,10 @@ make check
 
 
 %changelog
+* Thu Jun 03 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.11-1
+- Update to 0.11
+- Add support for nightly builds
+
 * Wed May 07 2014 Lubomir Rintel <lkundrak@v3.sk> - 0.10-2
 - Use ExclusiveArch to limit supported architectures instead of forcing
   it with BuildArch
