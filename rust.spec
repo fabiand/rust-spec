@@ -14,7 +14,7 @@
 %bcond_with nightly
 
 Name:           rust
-Version:        0.11
+Version:        0.11.0
 Release:        1%{?dist}
 Summary:        The Rust Programming Language
 
