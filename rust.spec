@@ -11,6 +11,7 @@
 #
 
 %bcond_without bootstrap
+%bcond_with nightly
 
 Name:           rust
 Version:        0.10
@@ -19,10 +20,14 @@ Summary:        The Rust Programming Language
 
 License:        ASL 2.0, MIT
 URL:            http://www.rust-lang.org
+%if %with nightly
+Source0:        http://static.rust-lang.org/dist/%{name}-nightly.tar.gz
+%else
 Source0:        http://static.rust-lang.org/dist/%{name}-%{version}.tar.gz
+%endif
 %if %with bootstrap
-Source1:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-x86_64-a7b2af1076d48e4a687a71a21478293e834349bd.tar.bz2 
-Source2:	http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-i386-3bef5684fd0582fbd4ddebd4514182d4f72924f7.tar.bz2 
+Source1:        http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-x86_64-a7b2af1076d48e4a687a71a21478293e834349bd.tar.bz2
+Source2:        http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-i386-3bef5684fd0582fbd4ddebd4514182d4f72924f7.tar.bz2
 %endif
 
 BuildRequires:  make
@@ -53,7 +58,11 @@ documentation.
 
 
 %prep
+%if %with nightly
+%setup -q -n %{name}-nightly
+%else
 %setup -q
+%endif
 %if %with bootstrap
 mkdir -p dl/
 cp %{SOURCE1} %{SOURCE2} dl/
@@ -75,7 +84,7 @@ sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not rec
 # LD_LIBRARY_PATH is passed to tell the linker were to find the different libraries,
 # this is needed because the rpaths were removed in prep
 make %{?_smp_mflags} \
-	LD_LIBRARY_PATH=%{_target_cpu}-unknown-linux-gnu/stage0/lib/:%{_target_cpu}-unknown-linux-gnu/stage1/lib/:%{_target_cpu}-unknown-linux-gnu/stage2/lib/:%{_target_cpu}-unknown-linux-gnu/stage3/lib/ 
+    LD_LIBRARY_PATH=%{_target_cpu}-unknown-linux-gnu/stage0/lib/:%{_target_cpu}-unknown-linux-gnu/stage1/lib/:%{_target_cpu}-unknown-linux-gnu/stage2/lib/:%{_target_cpu}-unknown-linux-gnu/stage3/lib/
 
 
 %install
