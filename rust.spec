@@ -4,11 +4,10 @@
 #
 # Issues
 # - Custom LLVM - use --llvm-root=?
-# - Hardcoded libdir
 # - libuv is included
 #
-# Wiki page: https://github.com/mozilla/rust/wiki/Note-packaging
-#
+
+%global _triple_override %{_target_cpu}-unknown-linux-gnu
 
 %bcond_without bootstrap
 %bcond_with nightly
@@ -17,8 +16,7 @@ Name:           rust
 Version:        0.11.0
 Release:        1%{?dist}
 Summary:        The Rust Programming Language
-
-License:        ASL 2.0, MIT
+License:        ASL 2.0 and MIT
 URL:            http://www.rust-lang.org
 %if %with nightly
 Source0:        http://static.rust-lang.org/dist/%{name}-nightly.tar.gz
@@ -30,23 +28,19 @@ Source1:        http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03
 Source2:        http://static.rust-lang.org/stage0-snapshots/rust-stage0-2014-03-28-b8601a3-linux-i386-3bef5684fd0582fbd4ddebd4514182d4f72924f7.tar.bz2
 %endif
 
-BuildRequires:  make
 BuildRequires:  llvm-devel
 BuildRequires:  clang-devel
-BuildRequires:  gcc
-BuildRequires:  gcc-c++
-BuildRequires:  python
+BuildRequires:  python2-devel
 BuildRequires:  perl
 BuildRequires:  curl
 #BuildRequires:  pandoc
-BuildRequires:  chrpath
 BuildRequires:  git
 %if %without bootstrap
 BuildRequires:  rust
 %endif
 
 # LLVM features are only present in x86
-ExclusiveArch:      x86_64 i686
+ExclusiveArch:  x86_64 %{ix86}
 
 %filter_from_requires /%{_target_cpu}-unknown-linux-gnu/d
 %filter_requires_in -P bin/(rust|cargo).*
@@ -73,8 +67,7 @@ sed -i "/^.*is not recog.*/ s/.*/echo configure: Argument \"'\$arg'\" is not rec
 
 
 %build
-%define _triple_override %{_target_cpu}-unknown-linux-gnu
-%configure --build=%{_triple_override} --host=%{_triple_override} --target=%{_triple_override} \
+%configure --build=%{_triple_override} --disable-rpath --host=%{_triple_override} --target=%{_triple_override} \
 %if %with bootstrap
 # nothing
 %else
@@ -88,19 +81,14 @@ make %{?_smp_mflags} \
 
 
 %install
-make install DESTDIR=%{buildroot}
-
-#mv %{buildroot}/%{_prefix}/lib %{buildroot}/%{_libdir}
+%make_install
 
 # Create ld.so.conf file
-mkdir -p %{buildroot}/%{_sysconfdir}/ld.so.conf.d
-cat <<EOF >/%{buildroot}/%{_sysconfdir}/ld.so.conf.d/rust-%{_target_cpu}.conf
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d
+cat <<EOF >/%{buildroot}%{_sysconfdir}/ld.so.conf.d/rust-%{_target_cpu}.conf
 %{_prefix}/lib/rustc/
 %{_prefix}/lib/rustc/%{_target_cpu}-unknown-linux-gnu/lib/
 EOF
-
-# Remove rpaths
-{ find %{buildroot}/usr/bin -type f ; find %{buildroot} -type f -name \*.so ; } | xargs chrpath --delete
 
 # Remove buildroot from manifest
 sed -i "s#^%{buildroot}##" %{buildroot}/%{_libdir}/rustlib/manifest
@@ -111,6 +99,8 @@ make check
 
 %post -p /sbin/ldconfig
 
+%postun -p /sbin/ldconfig
+
 
 %files
 %doc COPYRIGHT LICENSE-APACHE LICENSE-MIT README.md
@@ -118,11 +108,14 @@ make check
 %{_bindir}/rust*
 %{_libdir}/lib*
 %{_libdir}/rustlib/*
-%{_datadir}/man/*
+%{_mandir}/*
 
 
 %changelog
-* Thu Jun 03 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.11-1
+* Sat Aug 02 2014 Christopher Meng <rpm@cicku.me> - 0.11.0-2
+- SPEC cleanup
+
+* Thu Jun 03 2014 Fabian Deutsch <fabiand@fedoraproject.org> - 0.11.0-1
 - Update to 0.11
 - Add support for nightly builds
 
