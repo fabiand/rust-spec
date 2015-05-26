@@ -1,5 +1,5 @@
 Name:           hoedown
-Version:        3.0.2
+Version:        3.0.3
 Release:        1%{?dist}
 Summary:        Standards compliant, fast, secure markdown processing library in C
 
@@ -8,9 +8,7 @@ URL:            https://github.com/hoedown/hoedown
 Source0:        https://github.com/%{name}/%{name}/archive/%{version}.tar.gz#/%{name}-%{version}.tar.gz
 
 BuildRequires:  make
-BuildRequires:  clang
-
-ExclusiveArch:  x86_64
+BuildRequires:  gcc
 
 
 %description
@@ -37,14 +35,12 @@ TBD
 
 
 %build
-make %{?_smp_mflags} PREFIX=/usr all libhoedown.a
+make %{?_smp_mflags} CFLAGS="%{optflags}" LDFLAGS="%{__global_ldflags}" all
 
 
 %install
-make install DESTDIR=%{buildroot} PREFIX=/usr
-mkdir -p %{buildroot}%{_libdir}/
-mv -v %{buildroot}%{_prefix}/lib/* %{buildroot}%{_libdir}/
-
+make install DESTDIR=%{buildroot} PREFIX=%{_prefix} \
+      BINDIR=%{_bindir} LIBDIR=%{_libdir} INCLUDEDIR=%{_includedir}
 
 %files
 %license LICENSE
@@ -65,5 +61,8 @@ mv -v %{buildroot}%{_prefix}/lib/* %{buildroot}%{_libdir}/
 
 
 %changelog
+* Tue May 26 2015 Josh Stone <jistone@redhat.com> - 3.0.3-1
+- Update to 3.0.3
+
 * Tue Apr 28 2015 Fabian Deutsch <fabiand@fedoraproject.org> - 3.0.2-1
 - Initial package
